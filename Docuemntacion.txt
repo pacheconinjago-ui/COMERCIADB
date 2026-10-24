@@ -1,0 +1,38 @@
+Visión General del Proyecto
+Sistema de escritorio para gestión comercial y contable, desarrollado en Python con una interfaz gráfica moderna. Permite la administración centralizada y persistente de clientes, inventario, proveedores y gastos mediante operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
+
+Tecnologías Utilizadas
+
+Interfaz Gráfica: customtkinter para el diseño moderno y tkinter (ttk.Treeview) para las tablas de datos.
+
+Base de Datos: Oracle Database.
+
+Conector SQL: Librería oracledb nativa para Python.
+
+Estructura de Archivos
+
+database.py: Centraliza la lógica de conexión (conectar_db) y funciones genéricas de lectura (obtener_registros_tabla), evitando repetir código de conexión en cada módulo.
+
+base_crud.py: Contiene la clase principal BaseCRUDFrame. Es la plantilla maestra que dibuja el contenedor de búsqueda, la tabla central y los botones inferiores. Todos los demás módulos heredan de esta clase para mantener una UI uniforme.
+
+clientes_gui.py: Gestiona la tabla PFclientes.
+
+inventario_gui.py: Gestiona el catálogo, enlazando PFproducto, categorias y proveedores.
+
+proveedores_gui.py: Gestiona la tabla de proveedores (compras).
+
+gastos_gui.py: Gestiona la tabla PFgastos (finanzas).
+
+Lógica de Funcionamiento (Flujo de Datos)
+
+Interfaz (GUI): Cada módulo (ej. FrameGastos) construye su propio formulario en el panel izquierdo y define las columnas de su tabla en el panel derecho.
+
+Inyección SQL: Los botones de "Guardar" y "Eliminar" recopilan los datos de las cajas de texto y llaman a funciones externas dedicadas (ej. operar_gasto, operar_cliente).
+
+Transacciones: Estas funciones externas reciben un parámetro accion ("INSERT", "UPDATE", "DELETE"), ejecutan la consulta SQL correspondiente con marcadores de posición (:1, :2, :3), aplican un commit() y cierran la conexión.
+
+Guía de Errores Solucionados (Para el equipo)
+
+Error ORA-00942 y ORA-00904: Si la consola indica que la tabla o el identificador no existe, significa que los nombres en el código (ej. "gastos") no coinciden con las tablas creadas en Oracle (ej. "PFgastos"). Siempre verificar prefijos y nombres de columnas.
+
+Error DPY-4009 (Parámetros posicionales): En consultas de búsqueda con OR (ej. LIKE :1 OR LIKE :2), Oracle requiere que se envíe la variable de búsqueda repetida por cada marcador dentro de la tupla: cursor.execute(sql, (busqueda, busqueda)).
